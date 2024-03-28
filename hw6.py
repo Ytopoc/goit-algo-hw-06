@@ -15,12 +15,13 @@ class Name(Field):
 
 class Phone(Field):
     def __init__(self, value):
-        super().__init__(value)
-        if not self._validate_phone():
+        if not self._validate_phone(value):
             raise ValueError("Неправильний формат номера")
+        super().__init__(value)
 
-    def _validate_phone(self):
-        return len(str(self.value)) == 10 and str(self.value).isdigit()
+    def _validate_phone(self, value):
+        return len(value) == 10 and value.isdigit()
+
 
 
 class Record:
@@ -33,21 +34,21 @@ class Record:
 
     def add_phone(self, phone):
             self.phones.append(Phone(phone))
-            print("Номер успішно записано")
+
 
     def remove_phone(self, phone):
         self.phones = [p for p in self.phones if p.value != phone]
     
     def edit_phone(self, old_num, new_num):
-         for phone in self.phones:
-              if phone.value == old_num:
-                   phone.value == new_num
-                   break
+        self.find_phone(old_num)
+        self.add_phone(new_num)
+        self.remove_phone(old_num)
     
     def find_phone(self,number):
          for phone in self.phones:
               if phone.value == number:
-                   return phone.value
+                   return phone 
+              else: raise ValueError ("Такого номера не існує")
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
@@ -62,6 +63,9 @@ class AddressBook(UserDict):
     def delete(self, name):
          if name in self.data:
               del self.data[name]
+    
+    def __str__(self):
+        return "\n".join(str(record) for record in self.data.values())
 
 
     
@@ -93,7 +97,6 @@ print(john)  # Виведення: Contact name: John, phones: 1112223333; 55555
     # Пошук конкретного телефону у записі John
 found_phone = john.find_phone("5555555555")
 print(f"{john.name}: {found_phone}")  # Виведення: 5555555555
-
     # Видалення запису Jane
 book.delete("Jane")
 
